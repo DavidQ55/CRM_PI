@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRM Clientes</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/styles.css" />
+
+  <!-- FUENTES -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- ICONOS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- WELCOME PREMIUM -->
+<div id="welcomeScreen" class="welcome-screen">
+  <div class="welcome-overlay">
+
+    <div class="welcome-content">
+
+      <div class="logo-circle">
+        <i class="fas fa-chart-line"></i>
+      </div>
+
+      <h1>ClientFlow CRM</h1>
+      <p>Gestión de Clientes Inteligente</p>
+
+      <button class="btn btn-primary" onclick="enterApp()">
+        Continuar <i class="fas fa-arrow-right"></i>
+      </button>
+
+    </div>
+
+  </div>
+</div>
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">CRM</div>
+        <div>
+          <h2>ClientFlow</h2>
+          <p>Gestión comercial</p>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-btn active" onclick="showScreen('dashboard', this)">
+          <i class="fas fa-chart-line"></i> Inicio
+        </button>
+
+        <button class="nav-btn" onclick="showScreen('register', this)">
+          <i class="fas fa-user-plus"></i> Registrar cliente
+        </button>
+
+        <button class="nav-btn" onclick="showScreen('list', this)">
+          <i class="fas fa-users"></i> Lista de clientes
+        </button>
+
+        <button class="nav-btn" onclick="showScreen('signup', this)">
+          <i class="fas fa-user"></i> Registrarse
+        </button>
+
+        <button class="nav-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+        </button>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- HEADER -->
+      <header class="topbar">
+        <div>
+          <h1> Bienvenido </h1>
+          <p>Administra tus clientes de forma rápida, visual y profesional</p>
+        </div>
+      </header>
+
+      <!-- LOGIN -->
+      <section id="login" class="screen active">
+        <div class="card">
+          <div class="section-header">
+            <h2>🔐 Inicio de sesión</h2>
+            <p>Accede a tu cuenta para gestionar clientes</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Correo</label>
+              <input id="loginEmail" type="email" placeholder="correo@ejemplo.com" />
+            </div>
+
+            <div class="input-group">
+              <label>Contraseña</label>
+              <input id="loginPassword" type="password" placeholder="Contraseña" />
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn btn-primary" onclick="loginUser()">
+              <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="screen">
+        <div class="cards">
+
+          <div class="card stat-card">
+            <span>👥 Total de clientes</span>
+            <strong id="totalClients">0</strong>
+            <small>Clientes registrados en el sistema</small>
+          </div>
+
+          <div class="card info-card">
+            <h3>📊 Resumen del sistema</h3>
+            <p>
+              Desde aquí puedes registrar, editar, listar, filtrar y eliminar clientes de manera eficiente.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SIGNUP -->
+      <section id="signup" class="screen">
+        <div class="card">
+          <div class="section-header">
+            <h2>🧾 Crear cuenta</h2>
+            <p>Regístrate para acceder al CRM</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nombre</label>
+              <input id="userName" type="text" placeholder="Tu nombre" />
+            </div>
+
+            <div class="input-group">
+              <label>Email</label>
+              <input id="userEmail" type="email" placeholder="correo@email.com" />
+            </div>
+
+            <div class="input-group">
+              <label>Contraseña</label>
+              <input id="userPassword" type="password" placeholder="Contraseña" />
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn btn-primary" onclick="registerUser()">
+              <i class="fas fa-user-check"></i> Registrarse
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- REGISTER CLIENT -->
+      <section id="register" class="screen">
+        <div class="card">
+          <div class="section-header">
+            <h2 id="formTitle">🧍 Registrar cliente</h2>
+            <p>Completa la información del cliente</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nombre completo</label>
+              <input id="name" type="text" placeholder="Ej: Juan Camilo Peña" />
+            </div>
+
+            <div class="input-group">
+              <label>Correo electrónico</label>
+              <input id="email" type="email" placeholder="Ej: correo@ejemplo.com" />
+            </div>
+
+            <div class="input-group">
+              <label>Teléfono</label>
+              <input id="phone" type="text" placeholder="Ej: 3013031613" />
+            </div>
+
+            <div class="input-group">
+              <label>Segmento</label>
+              <select id="segment">
+                <option value="General">General</option>
+                <option value="VIP">VIP</option>
+                <option value="Frecuente">Frecuente</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn btn-primary" onclick="saveClient()">
+              <i class="fas fa-save"></i> Guardar
+            </button>
+
+            <button class="btn btn-secondary" onclick="clearForm()">
+              <i class="fas fa-broom"></i> Limpiar
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIST -->
+      <section id="list" class="screen">
+        <div class="card">
+
+          <div class="section-header list-head">
+            <div>
+              <h2>📋 Lista de clientes</h2>
+              <p>Consulta y administra los clientes registrados</p>
+            </div>
+
+            <div class="filters">
+              <input
+                id="search"
+                type="text"
+                placeholder="🔍 Buscar por nombre..."
+                onkeyup="loadClients()"
+              />
+
+              <select id="filterSegment" onchange="loadClients()">
+                <option value="">Todos los segmentos</option>
+                <option value="General">General</option>
+                <option value="VIP">VIP</option>
+                <option value="Frecuente">Frecuente</option>
+              </select>
+
+              <button class="btn btn-secondary" onclick="clearFilters()">
+                <i class="fas fa-eraser"></i> Limpiar filtros
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table id="table">
+              <thead>
+                <tr>
+                  <th>👤 Nombre</th>
+                  <th>📧 Email</th>
+                  <th>📱 Teléfono</th>
+                  <th>🏷 Segmento</th>
+                  <th>⚙ Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- JS -->
+  <script src="/static/js/app.js"></script>
+
+</body>
+</html>
