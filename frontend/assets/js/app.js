@@ -1,3 +1,4 @@
+let chartInstance = null;
 let editId = null;
 const API = "";
 
@@ -415,7 +416,11 @@ async function updateDashboard() {
     }
 
     const data = await res.json();
+
     totalElement.textContent = data.length;
+
+    renderChart(data); // Aqui se conecta el gráfico
+
   } catch (error) {
     console.error(error);
     totalElement.textContent = "0";
@@ -494,6 +499,7 @@ async function addPurchase(clientId) {
     }
 
     loadClients(); // actualiza segmento automáticamente
+    updateDashboard();
   } catch (error) {
     alert(error.message);
   }
@@ -558,12 +564,52 @@ async function deletePurchase(purchaseId, clientId) {
 
     viewPurchases(clientId); // recargar tabla
     loadClients(); // actualizar segmento
+    updateDashboard();
 
   } catch (error) {
     alert(error.message);
   }
 }
 
+//Función para construir el gráfico
+function renderChart(data) {
+  const ctx = document.getElementById("clientsChart");
+
+  if (!ctx) return;
+
+  const segments = {
+    General: 0,
+    Frecuente: 0,
+    VIP: 0
+  };
+
+  data.forEach(c => {
+    if (segments[c.segment] !== undefined) {
+      segments[c.segment]++;
+    }
+  });
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["General", "Frecuente", "VIP"],
+      datasets: [{
+        label: "Clientes por segmento",
+        data: [
+          segments.General,
+          segments.Frecuente,
+          segments.VIP
+        ]
+      }]
+    }
+  });
+}
 
 checkLogin();
-updateDashboard();
+setInterval(() => {
+  updateDashboard();
+}, 5000);

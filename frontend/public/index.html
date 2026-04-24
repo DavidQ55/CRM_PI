@@ -121,12 +121,24 @@
             <small>Clientes registrados en el sistema</small>
           </div>
 
+
           <div class="card info-card">
             <h3>📊 Resumen del sistema</h3>
             <p>
               Desde aquí puedes registrar, editar, listar, filtrar y eliminar clientes de manera eficiente.
             </p>
           </div>
+
+
+          <div class="card">
+              <h3>Distribución de clientes</h3>
+              <canvas id="clientsChart"></canvas>
+          </div>
+
+          <button class="btn btn-secondary" onclick="updateDashboard()">
+            Actualizar métricas
+          </button>
+
         </div>
       </section>
 
@@ -286,6 +298,7 @@
   </div>
 
   <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/static/js/app.js"></script>
 
 </body>
