@@ -362,6 +362,8 @@ async function loadClients() {
           </select>
         </td>
         <td class="actions-cell">
+          
+          
           <button
             class="edit-btn"
             data-id="${c.id}"
@@ -369,9 +371,20 @@ async function loadClients() {
           >
             Editar
           </button>
+
+          
           <button class="delete-btn" onclick="deleteClient(${c.id})">
             Eliminar
           </button>
+
+          <button onclick="addPurchase(${c.id})">
+            Compras
+          </button>
+
+          <button onclick="viewPurchases(${c.id})">
+            Ver compras
+          </button>
+          
         </td>
       `;
 
@@ -460,5 +473,97 @@ function enterApp() {
 
   }, 500);
 }
+
+async function addPurchase(clientId) {
+  try {
+    const res = await fetch(`${API}/purchases`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        amount: 1
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.detail || "Error registrando compra");
+    }
+
+    loadClients(); // actualiza segmento automáticamente
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+
+async function viewPurchases(clientId) {
+  try {
+    const res = await fetch(`${API}/purchases/${clientId}`);
+
+    if (!res.ok) {
+      throw new Error("Error obteniendo compras");
+    }
+
+    const data = await res.json();
+
+    const tbody = document.getElementById("purchasesTable");
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="2">No hay compras</td>
+        </tr>
+      `;
+    } else {
+      data.forEach(p => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${p.date}</td>
+          <td>
+            <button onclick="deletePurchase(${p.id}, ${clientId})">
+              Eliminar
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    showScreen("purchases");
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+
+async function deletePurchase(purchaseId, clientId) {
+  if (!confirm("¿Eliminar compra?")) return;
+
+  try {
+    const res = await fetch(`${API}/purchases/${purchaseId}`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) {
+      throw new Error("Error eliminando compra");
+    }
+
+    viewPurchases(clientId); // recargar tabla
+    loadClients(); // actualizar segmento
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+
 checkLogin();
 updateDashboard();
