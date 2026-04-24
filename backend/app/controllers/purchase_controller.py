@@ -1,0 +1,55 @@
+from database.db import get_conn
+from datetime import datetime
+
+def add_purchase(p):
+    conn = get_conn()
+    try:
+        conn.execute(
+            "INSERT INTO purchases(client_id, amount, date) VALUES(?, ?, ?)",
+            (p.client_id, p.amount, datetime.now().isoformat())
+        )
+        conn.commit()
+
+        classify_client(p.client_id)
+        return True
+    finally:
+        conn.close()
+
+
+def get_purchases(client_id):
+    conn = get_conn()
+    try:
+        rows = conn.execute(
+            "SELECT * FROM purchases WHERE client_id=? ORDER BY date DESC",
+            (client_id,)
+        ).fetchall()
+
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
+
+
+def classify_client(client_id):
+    conn = get_conn()
+    try:
+        total = conn.execute("""
+            SELECT COUNT(*) as total
+            FROM purchases
+            WHERE client_id=?
+            AND date >= datetime('now','-30 days')
+        """, (client_id,)).fetchone()["total"]
+
+        if total >= 10:
+            segment = "VIP"
+        elif total >= 5:
+            segment = "Frecuente"
+        else:
+            segment = "General"
+
+        conn.execute(
+            "UPDATE clients SET segment=? WHERE id=?",
+            (segment, client_id)
+        )
+        conn.commit()
+    finally:
+        conn.close()
