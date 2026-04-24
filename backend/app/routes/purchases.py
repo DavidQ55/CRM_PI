@@ -4,11 +4,17 @@ from app.controllers import purchase_controller
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
 
+
 @router.post("")
 def add_purchase(p: Purchase):
     purchase_controller.add_purchase(p)
     return {"message": "Compra registrada"}
 
+
+# Top clientes
+@router.get("/top")
+def get_top_clients():
+    return purchase_controller.top_clients()
 
 @router.get("/{client_id}")
 def get_purchases(client_id: int):

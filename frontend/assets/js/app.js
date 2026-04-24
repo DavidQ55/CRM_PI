@@ -1,4 +1,5 @@
 let chartInstance = null;
+let topChartInstance = null;
 let editId = null;
 const API = "";
 
@@ -421,9 +422,18 @@ async function updateDashboard() {
 
     renderChart(data); // Aqui se conecta el gráfico
 
+    const topRes = await fetch(`${API}/purchases/top`);
+
+    if (topRes.ok) {
+      const topData = await topRes.json();
+      renderTopClientsChart(topData);
+    } else {
+      console.warn("Error cargando top clientes");
+    }
+
+
   } catch (error) {
     console.error(error);
-    totalElement.textContent = "0";
   }
 }
 
@@ -608,6 +618,31 @@ function renderChart(data) {
     }
   });
 }
+
+//Función Top clientes
+function renderTopClientsChart(data) {
+  const ctx = document.getElementById("topClientsChart");
+  if (!ctx) return;
+
+  const labels = data.map(c => c.name);
+  const values = data.map(c => c.total);
+
+  if (topChartInstance) {
+    topChartInstance.destroy();
+  }
+
+  topChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Top 5 clientes con más compras",
+        data: values
+      }]
+    }
+  });
+}
+
 
 checkLogin();
 setInterval(() => {
