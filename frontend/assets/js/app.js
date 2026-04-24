@@ -399,6 +399,7 @@ async function loadClients() {
 }
 
 async function updateDashboard() {
+  const scrollY = window.scrollY; // guardar scroll
   const totalElement = document.getElementById("totalClients");
   if (!totalElement) return;
 
@@ -435,6 +436,9 @@ async function updateDashboard() {
   } catch (error) {
     console.error(error);
   }
+
+  window.scrollTo(0, scrollY);
+
 }
 
 function safeJs(value) {
@@ -641,6 +645,17 @@ function renderTopClientsChart(data) {
       }]
     }
   });
+}
+
+function exportChart(canvasId) {
+  const canvas = document.getElementById(canvasId);
+
+  const url = canvas.toDataURL("image/png");
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${canvasId}.png`;
+  a.click();
 }
 
 
