@@ -13,3 +13,11 @@ def add_purchase(p: Purchase):
 @router.get("/{client_id}")
 def get_purchases(client_id: int):
     return purchase_controller.get_purchases(client_id)
+
+
+@router.delete("/{purchase_id}")
+def delete_purchase(purchase_id: int):
+    purchase_controller.delete_purchase(purchase_id)
+    return {"message": "Compra eliminada"}
+
+

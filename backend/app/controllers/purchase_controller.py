@@ -29,6 +29,25 @@ def get_purchases(client_id):
         conn.close()
 
 
+def delete_purchase(purchase_id):
+    conn = get_conn()
+    try:
+        client_id = conn.execute(
+            "SELECT client_id FROM purchases WHERE id=?",
+            (purchase_id,)
+        ).fetchone()["client_id"]
+
+        conn.execute(
+            "DELETE FROM purchases WHERE id=?",
+            (purchase_id,)
+        )
+        conn.commit()
+
+        classify_client(client_id)
+
+    finally:
+        conn.close()
+
 def classify_client(client_id):
     conn = get_conn()
     try:
