@@ -1,0 +1,44 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - "feature/*"
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  test:
+    name: Ejecutar pruebas (CI)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Ejecutar tests con coverage
+        run: |
+          pytest backend/tests --cov=backend/app --cov-report=term-missing
+
+  deploy:
+    name: Despliegue (CD)
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy (simulado)
+        run: echo "Aplicación desplegada correctamente 🚀"
