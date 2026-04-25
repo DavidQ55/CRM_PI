@@ -3,9 +3,9 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - "feature/*"
       - main
       - David
+      - "feature/*"
   pull_request:
     branches:
       - main
@@ -21,13 +21,19 @@ jobs:
         with:
           python-version: 3.11
 
-      - run: |
+      - name: Instalar dependencias
+        run: |
           pip install -r backend/requirements.txt
           pip install pytest pytest-cov
 
-      - run: |
+      - name: Inicializar base de datos
+        run: |
           cd backend
           python -c "from app.database.db import init_db; init_db()"
+
+      - name: Ejecutar tests
+        run: |
+          cd backend
           python -m pytest tests --cov=app --cov-report=term-missing
 
   deploy:
@@ -36,4 +42,4 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - run: echo "Aplicación desplegada correctamente"
+      - run: echo "Deploy simulado"
