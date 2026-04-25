@@ -5,9 +5,9 @@ on:
     branches:
       - "feature/*"
       - main
+      - David
   pull_request:
     branches:
-      - develop
       - main
 
 jobs:
