@@ -12,39 +12,29 @@ on:
 
 jobs:
   test:
-    name: Ejecutar pruebas (CI)
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonar repositorio
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Configurar Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      - name: Instalar dependencias
-        run: |
+      - run: |
           pip install -r backend/requirements.txt
           pip install pytest pytest-cov
 
       - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$PWD/backend" >> $GITHUB_ENV
+        run: echo "PYTHONPATH=$GITHUB_WORKSPACE/backend" >> $GITHUB_ENV
 
-      - name: Inicializar base de datos
-        run: python -c "from app.database.db import init_db; init_db()"
-
-      - name: Ejecutar tests
+      - name: Run tests
         run: python -m pytest backend/tests --cov=backend/app --cov-report=term-missing
 
-
   deploy:
-    name: Despliegue (CD simulado)
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Deploy
-        run: echo "Aplicación desplegada correctamente 🚀"
+      - run: echo "Deploy simulado"
