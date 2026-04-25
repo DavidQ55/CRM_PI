@@ -5,7 +5,6 @@ on:
     branches:
       - "feature/*"
       - main
-      - David
   pull_request:
     branches:
       - develop
@@ -29,28 +28,23 @@ jobs:
         run: |
           pip install -r backend/requirements.txt
           pip install pytest pytest-cov
-          
+
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$PWD/backend" >> $GITHUB_ENV
 
       - name: Inicializar base de datos
-        run: |
-          cd backend
-          python -c "from app.database.db import init_db; init_db()"
-
+        run: python -c "from app.database.db import init_db; init_db()"
 
       - name: Ejecutar tests
-        run: |
-          cd backend
-          python -m pytest tests --cov=app --cov-report=term-missing
+        run: python -m pytest backend/tests --cov=backend/app --cov-report=term-missing
 
 
   deploy:
-    name: Despliegue (CD)
+    name: Despliegue (CD simulado)
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Deploy (simulado)
+      - name: Deploy
         run: echo "Aplicación desplegada correctamente 🚀"
