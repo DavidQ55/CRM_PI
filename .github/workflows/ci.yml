@@ -33,6 +33,7 @@ jobs:
       - name: Ejecutar tests con coverage
         run: |
           cd backend
+          python -c "from app.database.db import init_db; init_db()"
           python -m pytest tests --cov=app --cov-report=term-missing
 
 
