@@ -40,6 +40,11 @@ def init_db():
         FOREIGN KEY(client_id) REFERENCES clients(id)
     )
     """)
+    
+    try:
+        conn.execute("ALTER TABLE clients ADD COLUMN notes TEXT")
+    except:
+        pass
 
     conn.commit()
     conn.close()
