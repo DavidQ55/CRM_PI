@@ -136,13 +136,14 @@ async function saveClient() {
   const email = document.getElementById("email").value.trim();
   const phone = document.getElementById("phone").value.trim();
   const segment = document.getElementById("segment").value;
+  const notes = document.getElementById("notes").value.trim();
 
   if (!name || !email || !phone) {
     alert("Todos los campos son obligatorios");
     return;
   }
 
-  const data = { name, email, phone, segment };
+  const data = { name, email, phone, segment, notes };
 
   try {
     let response;
@@ -184,7 +185,7 @@ async function saveClient() {
   }
 }
 
-function editClient(id, name, email, phone, segment) {
+function editClient(id, name, email, phone, segment, notes) {
   const user = localStorage.getItem("crm_user");
   if (!user) {
     alert("Debes iniciar sesión primero");
@@ -196,6 +197,7 @@ function editClient(id, name, email, phone, segment) {
   document.getElementById("email").value = email;
   document.getElementById("phone").value = phone;
   document.getElementById("segment").value = segment;
+  document.getElementById("notes").value = notes || "";
 
   document.getElementById("formTitle").textContent = "Editar cliente";
   editId = id;
@@ -239,6 +241,7 @@ function clearForm() {
   document.getElementById("email").value = "";
   document.getElementById("phone").value = "";
   document.getElementById("segment").value = "General";
+  document.getElementById("notes").value = "";
 
   editId = null;
   document.getElementById("formTitle").textContent = "Registrar cliente";
@@ -363,13 +366,19 @@ async function loadClients() {
             <option value="Frecuente" ${c.segment === "Frecuente" ? "selected" : ""}>Frecuente</option>
           </select>
         </td>
+
+        <td title="${escapeHtml(c.notes || "")}">
+          ${escapeHtml((c.notes || "").slice(0, 30))}...
+        </td>
+
+
         <td class="actions-cell">
           
           
           <button
             class="edit-btn"
             data-id="${c.id}"
-            onclick="editClient(${c.id}, '${safeJs(c.name)}', '${safeJs(c.email)}', '${safeJs(c.phone)}', '${safeJs(c.segment)}')"
+            onclick="editClient(${c.id}, '${safeJs(c.name)}', '${safeJs(c.email)}', '${safeJs(c.phone)}', '${safeJs(c.segment)}', '${safeJs(c.notes || "")}')"
           >
             Editar
           </button>
