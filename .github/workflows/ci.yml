@@ -28,9 +28,9 @@ jobs:
 
       - name: Inicializar base de datos
         run: |
-          cd backend
-          python -c "from app.database.db import init_db; init_db()"
+          python backend/app/database/db.py
 
+          
       - name: Ejecutar tests
         run: |
           cd backend
