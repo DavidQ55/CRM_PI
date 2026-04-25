@@ -29,11 +29,18 @@ jobs:
         run: |
           pip install -r backend/requirements.txt
           pip install pytest pytest-cov
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PWD/backend" >> $GITHUB_ENV
 
-      - name: Ejecutar tests con coverage
+      - name: Inicializar base de datos
         run: |
           cd backend
           python -c "from app.database.db import init_db; init_db()"
+
+
+      - name: Ejecutar tests
+        run: |
+          cd backend
           python -m pytest tests --cov=app --cov-report=term-missing
 
 
