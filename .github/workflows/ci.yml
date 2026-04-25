@@ -1,0 +1,46 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - David
+      - "feature/*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Inicializar base de datos
+        run: |
+          cd backend
+          python -c "from database.db import init_db; init_db()"
+
+
+      - name: Ejecutar tests
+        run: |
+          cd backend
+          python -m pytest tests --cov=app --cov-report=term-missing
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - run: echo "Deploy simulado"

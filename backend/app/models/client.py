@@ -5,3 +5,4 @@ class Client(BaseModel):
     email: EmailStr
     phone: str
     segment: str = "General"
+    notes: str | None = None

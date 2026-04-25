@@ -121,12 +121,36 @@
             <small>Clientes registrados en el sistema</small>
           </div>
 
+
           <div class="card info-card">
             <h3>📊 Resumen del sistema</h3>
             <p>
               Desde aquí puedes registrar, editar, listar, filtrar y eliminar clientes de manera eficiente.
             </p>
           </div>
+
+
+          <div class="card">
+              <h3>Distribución de clientes</h3>
+              <canvas id="clientsChart"></canvas>
+          </div>
+
+          <div class="card">
+            <h3>Top 5 clientes con más compras</h3>
+            <canvas id="topClientsChart"></canvas>
+          </div>
+
+          <button class="btn btn-secondary" onclick="updateDashboard()">
+            Actualizar métricas
+          </button>
+
+          <button class="btn btn-secondary" onclick="exportChart('clientsChart')">
+            Exportar gráfico distribución
+          </button>
+
+          <button class="btn btn-secondary" onclick="exportChart('topClientsChart')">
+            Exportar Top clientes
+          </button>
 
         </div>
       </section>
@@ -198,6 +222,11 @@
             </div>
           </div>
 
+          <div class="input-group">
+            <label>Notas</label>
+            <textarea id="notes" placeholder="Información adicional del cliente"></textarea>
+          </div>
+
           <div class="actions-row">
             <button class="btn btn-primary" onclick="saveClient()">
               <i class="fas fa-save"></i> Guardar
@@ -249,6 +278,7 @@
                   <th>📧 Email</th>
                   <th>📱 Teléfono</th>
                   <th>🏷 Segmento</th>
+                  <th>📝 Notas</th>
                   <th>⚙ Acciones</th>
                 </tr>
               </thead>
@@ -287,6 +317,7 @@
   </div>
 
   <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/static/js/app.js"></script>
 
 </body>

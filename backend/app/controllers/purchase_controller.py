@@ -72,3 +72,21 @@ def classify_client(client_id):
         conn.commit()
     finally:
         conn.close()
+
+
+# 5 Mejores clientes (los 5 que más compras tienen)        
+def top_clients():
+    conn = get_conn()
+    try:
+        rows = conn.execute("""
+            SELECT c.id, c.name, COUNT(p.id) as total
+            FROM clients c
+            LEFT JOIN purchases p ON c.id = p.client_id
+            GROUP BY c.id
+            ORDER BY total DESC
+            LIMIT 5
+        """).fetchall()
+
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()

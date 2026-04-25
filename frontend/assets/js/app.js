@@ -1,3 +1,5 @@
+let chartInstance = null;
+let topChartInstance = null;
 let editId = null;
 const API = "";
 
@@ -134,13 +136,14 @@ async function saveClient() {
   const email = document.getElementById("email").value.trim();
   const phone = document.getElementById("phone").value.trim();
   const segment = document.getElementById("segment").value;
+  const notes = document.getElementById("notes").value.trim();
 
   if (!name || !email || !phone) {
     alert("Todos los campos son obligatorios");
     return;
   }
 
-  const data = { name, email, phone, segment };
+  const data = { name, email, phone, segment, notes };
 
   try {
     let response;
@@ -182,7 +185,7 @@ async function saveClient() {
   }
 }
 
-function editClient(id, name, email, phone, segment) {
+function editClient(id, name, email, phone, segment, notes) {
   const user = localStorage.getItem("crm_user");
   if (!user) {
     alert("Debes iniciar sesión primero");
@@ -194,6 +197,7 @@ function editClient(id, name, email, phone, segment) {
   document.getElementById("email").value = email;
   document.getElementById("phone").value = phone;
   document.getElementById("segment").value = segment;
+  document.getElementById("notes").value = notes || "";
 
   document.getElementById("formTitle").textContent = "Editar cliente";
   editId = id;
@@ -237,6 +241,7 @@ function clearForm() {
   document.getElementById("email").value = "";
   document.getElementById("phone").value = "";
   document.getElementById("segment").value = "General";
+  document.getElementById("notes").value = "";
 
   editId = null;
   document.getElementById("formTitle").textContent = "Registrar cliente";
@@ -361,13 +366,19 @@ async function loadClients() {
             <option value="Frecuente" ${c.segment === "Frecuente" ? "selected" : ""}>Frecuente</option>
           </select>
         </td>
+
+        <td title="${escapeHtml(c.notes || "")}">
+          ${escapeHtml((c.notes || "").slice(0, 30))}...
+        </td>
+
+
         <td class="actions-cell">
           
           
           <button
             class="edit-btn"
             data-id="${c.id}"
-            onclick="editClient(${c.id}, '${safeJs(c.name)}', '${safeJs(c.email)}', '${safeJs(c.phone)}', '${safeJs(c.segment)}')"
+            onclick="editClient(${c.id}, '${safeJs(c.name)}', '${safeJs(c.email)}', '${safeJs(c.phone)}', '${safeJs(c.segment)}', '${safeJs(c.notes || "")}')"
           >
             Editar
           </button>
@@ -397,6 +408,7 @@ async function loadClients() {
 }
 
 async function updateDashboard() {
+  const scrollY = window.scrollY; // guardar scroll
   const totalElement = document.getElementById("totalClients");
   if (!totalElement) return;
 
@@ -415,11 +427,27 @@ async function updateDashboard() {
     }
 
     const data = await res.json();
+
     totalElement.textContent = data.length;
+
+    renderChart(data); // Aqui se conecta el gráfico
+
+    const topRes = await fetch(`${API}/purchases/top`);
+
+    if (topRes.ok) {
+      const topData = await topRes.json();
+      renderTopClientsChart(topData);
+    } else {
+      console.warn("Error cargando top clientes");
+    }
+
+
   } catch (error) {
     console.error(error);
-    totalElement.textContent = "0";
   }
+
+  window.scrollTo(0, scrollY);
+
 }
 
 function safeJs(value) {
@@ -494,6 +522,7 @@ async function addPurchase(clientId) {
     }
 
     loadClients(); // actualiza segmento automáticamente
+    updateDashboard();
   } catch (error) {
     alert(error.message);
   }
@@ -558,12 +587,88 @@ async function deletePurchase(purchaseId, clientId) {
 
     viewPurchases(clientId); // recargar tabla
     loadClients(); // actualizar segmento
+    updateDashboard();
 
   } catch (error) {
     alert(error.message);
   }
 }
 
+//Función para construir el gráfico
+function renderChart(data) {
+  const ctx = document.getElementById("clientsChart");
+
+  if (!ctx) return;
+
+  const segments = {
+    General: 0,
+    Frecuente: 0,
+    VIP: 0
+  };
+
+  data.forEach(c => {
+    if (segments[c.segment] !== undefined) {
+      segments[c.segment]++;
+    }
+  });
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["General", "Frecuente", "VIP"],
+      datasets: [{
+        label: "Clientes por segmento",
+        data: [
+          segments.General,
+          segments.Frecuente,
+          segments.VIP
+        ]
+      }]
+    }
+  });
+}
+
+//Función Top clientes
+function renderTopClientsChart(data) {
+  const ctx = document.getElementById("topClientsChart");
+  if (!ctx) return;
+
+  const labels = data.map(c => c.name);
+  const values = data.map(c => c.total);
+
+  if (topChartInstance) {
+    topChartInstance.destroy();
+  }
+
+  topChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Top 5 clientes con más compras",
+        data: values
+      }]
+    }
+  });
+}
+
+function exportChart(canvasId) {
+  const canvas = document.getElementById(canvasId);
+
+  const url = canvas.toDataURL("image/png");
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${canvasId}.png`;
+  a.click();
+}
+
 
 checkLogin();
-updateDashboard();
+setInterval(() => {
+  updateDashboard();
+}, 5000);

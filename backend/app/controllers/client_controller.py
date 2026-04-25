@@ -5,8 +5,8 @@ def create_client(data):
     conn = get_conn()
     try:
         cur = conn.execute(
-            "INSERT INTO clients(name, email, phone, segment) VALUES(?, ?, ?, ?)",
-            (data.name, data.email, data.phone, data.segment)
+            "INSERT INTO clients(name, email, phone, segment, notes) VALUES(?, ?, ?, ?, ?)",
+            (data.name, data.email, data.phone, data.segment, data.notes)
         )
         conn.commit()
         return cur.lastrowid
@@ -48,8 +48,8 @@ def update_client(client_id, data):
             return False
 
         conn.execute(
-            "UPDATE clients SET name=?, email=?, phone=?, segment=? WHERE id=?",
-            (data.name, data.email, data.phone, data.segment, client_id)
+            "UPDATE clients SET name=?, email=?, phone=?, segment=?, notes=? WHERE id=?",
+            (data.name, data.email, data.phone, data.segment, data.notes, client_id)
         )
         conn.commit()
         return True
