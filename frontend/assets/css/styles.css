@@ -342,6 +342,8 @@ input:focus, select:focus {
 .btn-secondary {
   background: var(--secondary);
   color: white;
+  margin-bottom: 16px;
+
 }
 
 .btn-secondary:hover {
