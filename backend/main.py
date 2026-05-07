@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.routes import clients, purchases, users
+from app.routes import clients, purchases, users, dashboard
 from database.db import init_db
 
 app = FastAPI(title="CRM Clientes API")
@@ -26,3 +26,4 @@ def home():
 app.include_router(clients.router)
 app.include_router(purchases.router)
 app.include_router(users.router)
+app.include_router(dashboard.router)

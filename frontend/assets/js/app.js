@@ -408,46 +408,40 @@ async function loadClients() {
 }
 
 async function updateDashboard() {
-  const scrollY = window.scrollY; // guardar scroll
-  const totalElement = document.getElementById("totalClients");
-  if (!totalElement) return;
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
 
-  const user = localStorage.getItem("crm_user");
-  if (!user) {
-    totalElement.textContent = "0";
+  if (startDate && endDate && startDate > endDate) {
+    alert("La fecha inicial no puede ser mayor a la final");
     return;
   }
 
   try {
-    const res = await fetch(`${API}/clients`);
+    let url = `${API}/dashboard`;
+
+    if (startDate && endDate) {
+      url += `?start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    const res = await fetch(url);
 
     if (!res.ok) {
-      totalElement.textContent = "0";
-      return;
+      throw new Error("Error cargando dashboard");
     }
 
     const data = await res.json();
 
-    totalElement.textContent = data.length;
+    document.getElementById("totalClients").textContent =
+      data.total_clients;
 
-    renderChart(data); // Aqui se conecta el gráfico
+    renderChartFromSegments(data.segments);
 
-    const topRes = await fetch(`${API}/purchases/top`);
-
-    if (topRes.ok) {
-      const topData = await topRes.json();
-      renderTopClientsChart(topData);
-    } else {
-      console.warn("Error cargando top clientes");
-    }
-
+    renderTopClientsChart(data.top_clients);
 
   } catch (error) {
     console.error(error);
+    alert(error.message);
   }
-
-  window.scrollTo(0, scrollY);
-
 }
 
 function safeJs(value) {
@@ -611,6 +605,32 @@ function renderChart(data) {
       segments[c.segment]++;
     }
   });
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["General", "Frecuente", "VIP"],
+      datasets: [{
+        label: "Clientes por segmento",
+        data: [
+          segments.General,
+          segments.Frecuente,
+          segments.VIP
+        ]
+      }]
+    }
+  });
+}
+
+//Función para filtrar las métricas por fecha
+function renderChartFromSegments(segments) {
+  const ctx = document.getElementById("clientsChart");
+
+  if (!ctx) return;
 
   if (chartInstance) {
     chartInstance.destroy();
