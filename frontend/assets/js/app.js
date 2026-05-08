@@ -353,6 +353,10 @@ async function loadClients() {
     }
 
     data.forEach(c => {
+
+      const currentUser = JSON.parse(localStorage.getItem("crm_user"));
+      const canManage = currentUser.role === "admin";
+
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
@@ -373,20 +377,19 @@ async function loadClients() {
 
 
         <td class="actions-cell">
-          
-          
-          <button
-            class="edit-btn"
-            data-id="${c.id}"
-            onclick="editClient(${c.id}, '${safeJs(c.name)}', '${safeJs(c.email)}', '${safeJs(c.phone)}', '${safeJs(c.segment)}', '${safeJs(c.notes || "")}')"
-          >
-            Editar
-          </button>
+          ${canManage ? `
+            <button
+              class="edit-btn"
+              data-id="${c.id}"
+              onclick="editClient(${c.id}, '${safeJs(c.name)}', '${safeJs(c.email)}', '${safeJs(c.phone)}', '${safeJs(c.segment)}', '${safeJs(c.notes || "")}')"
+            >
+              Editar
+            </button>
 
-          
-          <button class="delete-btn" onclick="deleteClient(${c.id})">
-            Eliminar
-          </button>
+            <button class="delete-btn" onclick="deleteClient(${c.id})">
+              Eliminar
+            </button>
+          ` : ""}
 
           <button onclick="addPurchase(${c.id})">
             Compras
@@ -395,7 +398,7 @@ async function loadClients() {
           <button onclick="viewPurchases(${c.id})">
             Ver compras
           </button>
-          
+
         </td>
       `;
 
@@ -549,9 +552,15 @@ async function viewPurchases(clientId) {
         tr.innerHTML = `
           <td>${p.date}</td>
           <td>
-            <button onclick="deletePurchase(${p.id}, ${clientId})">
-              Eliminar
-            </button>
+            ${
+              JSON.parse(localStorage.getItem("crm_user")).role === "admin"
+                ? `
+                  <button onclick="deletePurchase(${p.id}, ${clientId})">
+                    Eliminar
+                  </button>
+                `
+                : `<span>Sin permisos</span>`
+            }
           </td>
         `;
 

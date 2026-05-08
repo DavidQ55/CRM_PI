@@ -4,6 +4,7 @@ class UserRegister(BaseModel):
     name: str
     email: EmailStr
     password: str
+    role: str = "empleado"
 
 class UserLogin(BaseModel):
     email: EmailStr
