@@ -90,3 +90,70 @@ def top_clients():
         return [dict(r) for r in rows]
     finally:
         conn.close()
+        
+        
+def top_clients_by_date(start=None, end=None):
+    conn = get_conn()
+
+    try:
+
+        query = """
+            SELECT c.id, c.name, COUNT(p.id) as total
+            FROM clients c
+            LEFT JOIN purchases p ON c.id = p.client_id
+        """
+
+        params = []
+
+        if start and end:
+            query += """
+                WHERE date(p.date)
+                BETWEEN date(?) AND date(?)
+            """
+            params.extend([start, end])
+
+        query += """
+            GROUP BY c.id
+            ORDER BY total DESC
+            LIMIT 5
+        """
+
+        rows = conn.execute(query, params).fetchall()
+
+        return [dict(r) for r in rows]
+
+    finally:
+        conn.close()
+        
+        
+def clients_by_segment(start=None, end=None):
+
+    conn = get_conn()
+
+    try:
+
+        query = """
+            SELECT c.segment, COUNT(DISTINCT c.id) as total
+            FROM clients c
+            LEFT JOIN purchases p ON c.id = p.client_id
+        """
+
+        params = []
+
+        if start and end:
+            query += """
+                WHERE date(p.date)
+                BETWEEN date(?) AND date(?)
+            """
+            params.extend([start, end])
+
+        query += """
+            GROUP BY c.segment
+        """
+
+        rows = conn.execute(query, params).fetchall()
+
+        return [dict(r) for r in rows]
+
+    finally:
+        conn.close()

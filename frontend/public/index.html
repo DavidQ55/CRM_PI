@@ -118,39 +118,41 @@
           <div class="card stat-card">
             <span>👥 Total de clientes</span>
             <strong id="totalClients">0</strong>
-            <small>Clientes registrados en el sistema</small>
+
+
+            <button class="btn btn-secondary" onclick="updateDashboard()">
+              Actualizar métricas
+            </button>
+
+            <button class="btn btn-secondary" onclick="exportChart('clientsChart')">
+              Exportar gráfico distribución
+            </button>
+
+            <button class="btn btn-secondary" onclick="exportChart('topClientsChart')">
+              Exportar Top clientes
+            </button>
+            
+
           </div>
 
+          
+          <div>
 
-          <div class="card info-card">
-            <h3>📊 Resumen del sistema</h3>
-            <p>
-              Desde aquí puedes registrar, editar, listar, filtrar y eliminar clientes de manera eficiente.
-            </p>
-          </div>
+            <h3>Distribución de clientes</h3>
+            <canvas id="clientsChart"></canvas>
 
-
-          <div class="card">
-              <h3>Distribución de clientes</h3>
-              <canvas id="clientsChart"></canvas>
-          </div>
-
-          <div class="card">
             <h3>Top 5 clientes con más compras</h3>
             <canvas id="topClientsChart"></canvas>
-          </div>
 
-          <button class="btn btn-secondary" onclick="updateDashboard()">
-            Actualizar métricas
-          </button>
+            <label>Fecha inicio:</label>
+            <input type="date" id="startDate">
 
-          <button class="btn btn-secondary" onclick="exportChart('clientsChart')">
-            Exportar gráfico distribución
-          </button>
+            <label>Fecha fin:</label>
+            <input type="date" id="endDate">
 
-          <button class="btn btn-secondary" onclick="exportChart('topClientsChart')">
-            Exportar Top clientes
-          </button>
+            <button class="btn btn-secondary" onclick="updateDashboard()">Filtrar</button>
+
+          </div>  
 
         </div>
       </section>

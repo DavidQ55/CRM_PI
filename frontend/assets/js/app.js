@@ -353,6 +353,10 @@ async function loadClients() {
     }
 
     data.forEach(c => {
+
+      const currentUser = JSON.parse(localStorage.getItem("crm_user"));
+      const canManage = currentUser.role === "admin";
+
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
@@ -360,7 +364,7 @@ async function loadClients() {
         <td>${escapeHtml(c.email)}</td>
         <td>${escapeHtml(c.phone)}</td>
         <td>
-          <select onchange="changeSegment(${c.id}, this.value)">
+          <select class="segment-select" onchange="changeSegment(${c.id}, this.value)">
             <option value="General" ${c.segment === "General" ? "selected" : ""}>General</option>
             <option value="VIP" ${c.segment === "VIP" ? "selected" : ""}>VIP</option>
             <option value="Frecuente" ${c.segment === "Frecuente" ? "selected" : ""}>Frecuente</option>
@@ -373,29 +377,28 @@ async function loadClients() {
 
 
         <td class="actions-cell">
-          
-          
-          <button
-            class="edit-btn"
-            data-id="${c.id}"
-            onclick="editClient(${c.id}, '${safeJs(c.name)}', '${safeJs(c.email)}', '${safeJs(c.phone)}', '${safeJs(c.segment)}', '${safeJs(c.notes || "")}')"
-          >
-            Editar
-          </button>
+          ${canManage ? `
+            <button
+              class="edit-btn"
+              data-id="${c.id}"
+              onclick="editClient(${c.id}, '${safeJs(c.name)}', '${safeJs(c.email)}', '${safeJs(c.phone)}', '${safeJs(c.segment)}', '${safeJs(c.notes || "")}')"
+            >
+              Editar
+            </button>
 
-          
-          <button class="delete-btn" onclick="deleteClient(${c.id})">
-            Eliminar
-          </button>
+            <button class="delete-btn" onclick="deleteClient(${c.id})">
+              Eliminar
+            </button>
+          ` : ""}
 
-          <button onclick="addPurchase(${c.id})">
+          <button class="edit-btn" onclick="addPurchase(${c.id})">
             Compras
           </button>
 
-          <button onclick="viewPurchases(${c.id})">
+          <button class="edit-btn" onclick="viewPurchases(${c.id})">
             Ver compras
           </button>
-          
+
         </td>
       `;
 
@@ -408,46 +411,40 @@ async function loadClients() {
 }
 
 async function updateDashboard() {
-  const scrollY = window.scrollY; // guardar scroll
-  const totalElement = document.getElementById("totalClients");
-  if (!totalElement) return;
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
 
-  const user = localStorage.getItem("crm_user");
-  if (!user) {
-    totalElement.textContent = "0";
+  if (startDate && endDate && startDate > endDate) {
+    alert("La fecha inicial no puede ser mayor a la final");
     return;
   }
 
   try {
-    const res = await fetch(`${API}/clients`);
+    let url = `${API}/dashboard`;
+
+    if (startDate && endDate) {
+      url += `?start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    const res = await fetch(url);
 
     if (!res.ok) {
-      totalElement.textContent = "0";
-      return;
+      throw new Error("Error cargando dashboard");
     }
 
     const data = await res.json();
 
-    totalElement.textContent = data.length;
+    document.getElementById("totalClients").textContent =
+      data.total_clients;
 
-    renderChart(data); // Aqui se conecta el gráfico
+    renderChartFromSegments(data.segments);
 
-    const topRes = await fetch(`${API}/purchases/top`);
-
-    if (topRes.ok) {
-      const topData = await topRes.json();
-      renderTopClientsChart(topData);
-    } else {
-      console.warn("Error cargando top clientes");
-    }
-
+    renderTopClientsChart(data.top_clients);
 
   } catch (error) {
     console.error(error);
+    alert(error.message);
   }
-
-  window.scrollTo(0, scrollY);
-
 }
 
 function safeJs(value) {
@@ -555,9 +552,15 @@ async function viewPurchases(clientId) {
         tr.innerHTML = `
           <td>${p.date}</td>
           <td>
-            <button onclick="deletePurchase(${p.id}, ${clientId})">
-              Eliminar
-            </button>
+            ${
+              JSON.parse(localStorage.getItem("crm_user")).role === "admin"
+                ? `
+                  <button class="delete-btn" onclick="deletePurchase(${p.id}, ${clientId})">
+                    Eliminar
+                  </button>
+                `
+                : `<span>Sin permisos</span>`
+            }
           </td>
         `;
 
@@ -632,6 +635,56 @@ function renderChart(data) {
   });
 }
 
+//Función para filtrar las métricas por fecha
+function renderChartFromSegments(segments) {
+  const ctx = document.getElementById("clientsChart");
+
+  if (!ctx) return;
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["General", "Frecuente", "VIP"],
+      datasets: [{
+        label: "Clientes por segmento",
+        data: [
+          segments.General,
+          segments.Frecuente,
+          segments.VIP
+        ]
+      }]
+    },
+
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white"
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white"
+          }
+        },
+        y: {
+          ticks: {
+            color: "white"
+          }
+        }
+      }
+    }
+
+
+  });
+}
+
 //Función Top clientes
 function renderTopClientsChart(data) {
   const ctx = document.getElementById("topClientsChart");
@@ -652,7 +705,30 @@ function renderTopClientsChart(data) {
         label: "Top 5 clientes con más compras",
         data: values
       }]
+    },
+
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white"
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white"
+          }
+        },
+        y: {
+          ticks: {
+            color: "white"
+          }
+        }
+      }
     }
+
   });
 }
 
