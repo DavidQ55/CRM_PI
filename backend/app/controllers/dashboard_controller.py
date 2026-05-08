@@ -10,7 +10,7 @@ def get_dashboard_metrics(start_date=None, end_date=None):
             }
 
     query = """
-        SELECT c.segment, p.date
+        SELECT DISTINCT c.id, c.segment
         FROM clients c
         LEFT JOIN purchases p ON c.id = p.client_id
     """

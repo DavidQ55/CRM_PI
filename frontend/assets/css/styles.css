@@ -300,11 +300,24 @@ body {
 input, select {
   border: 1px solid var(--line);
   background: rgba(255,255,255,0.05);
-  color: white;
+  color: rgb(251, 249, 249);
   padding: 12px;
   border-radius: 10px;
   outline: none;
   transition: 0.2s ease;
+}
+
+#segment option {
+  color:#060606
+}
+
+.segment-select {
+  color: #ffffff;
+  background: rgba(255,255,255,0.05);
+}
+
+.segment-select option {
+  color: black;
 }
 
 input:focus, select:focus {
@@ -343,7 +356,6 @@ input:focus, select:focus {
   background: var(--secondary);
   color: white;
   margin-bottom: 16px;
-
 }
 
 .btn-secondary:hover {
@@ -386,6 +398,7 @@ tbody tr:hover td {
   border-radius: 8px;
   color: white;
   cursor: pointer;
+  margin-bottom: 16px;
 }
 
 .delete-btn {
@@ -395,6 +408,7 @@ tbody tr:hover td {
   border-radius: 8px;
   color: white;
   cursor: pointer;
+  margin-bottom: 16px;
 }
 
 /* RESPONSIVE */
@@ -412,4 +426,15 @@ tbody tr:hover td {
     grid-template-columns: 1fr;
   }
  
+}
+
+
+#table th:nth-child(5),
+#table td:nth-child(5) {
+  width: 280px;
+}
+
+#table th:nth-child(6),
+#table td:nth-child(6) {
+  width: 220px;
 }

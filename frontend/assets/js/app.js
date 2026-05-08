@@ -364,7 +364,7 @@ async function loadClients() {
         <td>${escapeHtml(c.email)}</td>
         <td>${escapeHtml(c.phone)}</td>
         <td>
-          <select onchange="changeSegment(${c.id}, this.value)">
+          <select class="segment-select" onchange="changeSegment(${c.id}, this.value)">
             <option value="General" ${c.segment === "General" ? "selected" : ""}>General</option>
             <option value="VIP" ${c.segment === "VIP" ? "selected" : ""}>VIP</option>
             <option value="Frecuente" ${c.segment === "Frecuente" ? "selected" : ""}>Frecuente</option>
@@ -391,11 +391,11 @@ async function loadClients() {
             </button>
           ` : ""}
 
-          <button onclick="addPurchase(${c.id})">
+          <button class="edit-btn" onclick="addPurchase(${c.id})">
             Compras
           </button>
 
-          <button onclick="viewPurchases(${c.id})">
+          <button class="edit-btn" onclick="viewPurchases(${c.id})">
             Ver compras
           </button>
 
@@ -555,7 +555,7 @@ async function viewPurchases(clientId) {
             ${
               JSON.parse(localStorage.getItem("crm_user")).role === "admin"
                 ? `
-                  <button onclick="deletePurchase(${p.id}, ${clientId})">
+                  <button class="delete-btn" onclick="deletePurchase(${p.id}, ${clientId})">
                     Eliminar
                   </button>
                 `
@@ -657,7 +657,31 @@ function renderChartFromSegments(segments) {
           segments.VIP
         ]
       }]
+    },
+
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white"
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white"
+          }
+        },
+        y: {
+          ticks: {
+            color: "white"
+          }
+        }
+      }
     }
+
+
   });
 }
 
@@ -681,7 +705,30 @@ function renderTopClientsChart(data) {
         label: "Top 5 clientes con más compras",
         data: values
       }]
+    },
+
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white"
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white"
+          }
+        },
+        y: {
+          ticks: {
+            color: "white"
+          }
+        }
+      }
     }
+
   });
 }
 
