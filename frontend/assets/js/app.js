@@ -1,7 +1,8 @@
 let chartInstance = null;
 let topChartInstance = null;
 let editId = null;
-const API = "";
+const API = window.API_URL;
+
 
 function showScreen(screenId, clickedButton = null) {
   const user = localStorage.getItem("crm_user");
